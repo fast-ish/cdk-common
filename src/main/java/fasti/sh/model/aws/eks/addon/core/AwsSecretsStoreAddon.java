@@ -1,4 +1,4 @@
-package fasti.sh.model.aws.eks.addon.core.secretprovider;
+package fasti.sh.model.aws.eks.addon.core;
 
 import fasti.sh.model.aws.eks.HelmChart;
 
