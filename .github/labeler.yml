@@ -2,68 +2,90 @@
 # Automatically applies labels to PRs based on file changes
 
 documentation:
-  - '**/*.md'
-  - 'docs/**/*'
-  - 'README.md'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.md'
+      - 'docs/**/*'
+      - 'README.md'
 
 dependencies:
-  - 'pom.xml'
-  - '**/pom.xml'
-  - 'package.json'
-  - 'package-lock.json'
-  - 'requirements.txt'
-  - 'go.mod'
-  - 'go.sum'
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'pom.xml'
+      - '**/pom.xml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'requirements.txt'
+      - 'go.mod'
+      - 'go.sum'
 
 github-actions:
-  - '.github/**/*'
-  - '.github/workflows/**/*'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/**/*'
+      - '.github/workflows/**/*'
 
 java:
-  - '**/*.java'
-  - 'src/main/java/**/*'
-  - 'src/test/java/**/*'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.java'
+      - 'src/main/java/**/*'
+      - 'src/test/java/**/*'
 
 resources:
-  - 'src/main/resources/**/*'
-  - 'src/test/resources/**/*'
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/main/resources/**/*'
+      - 'src/test/resources/**/*'
 
 test:
-  - 'src/test/**/*'
-  - '**/*Test.java'
-  - '**/*Tests.java'
-  - '**/test/**/*'
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/test/**/*'
+      - '**/*Test.java'
+      - '**/*Tests.java'
+      - '**/test/**/*'
 
 build:
-  - 'pom.xml'
-  - 'Dockerfile'
-  - '.dockerignore'
-  - 'Makefile'
-  - 'build.gradle'
-  - 'settings.gradle'
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'pom.xml'
+      - 'Dockerfile'
+      - '.dockerignore'
+      - 'Makefile'
+      - 'build.gradle'
+      - 'settings.gradle'
 
 config:
-  - '**/*.yml'
-  - '**/*.yaml'
-  - '**/*.json'
-  - '**/*.properties'
-  - '**/*.xml'
-  - '.gitignore'
-  - '.editorconfig'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.yml'
+      - '**/*.yaml'
+      - '**/*.json'
+      - '**/*.properties'
+      - '**/*.xml'
+      - '.gitignore'
+      - '.editorconfig'
 
 cdk:
-  - '**/cdk/**/*'
-  - '**/*Stack.java'
-  - '**/*Construct.java'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/cdk/**/*'
+      - '**/*Stack.java'
+      - '**/*Construct.java'
 
 security:
-  - '**/security/**/*'
-  - '**/auth/**/*'
-  - '**/crypto/**/*'
-  - '.github/dependabot.yml'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/security/**/*'
+      - '**/auth/**/*'
+      - '**/crypto/**/*'
+      - '.github/dependabot.yml'
 
 infrastructure:
-  - '**/infra/**/*'
-  - '**/infrastructure/**/*'
-  - '**/deploy/**/*'
-  - '**/deployment/**/*'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/infra/**/*'
+      - '**/infrastructure/**/*'
+      - '**/deploy/**/*'
+      - '**/deployment/**/*'

@@ -121,7 +121,7 @@ public class GrafanaConstruct extends GrafanaBaseConstruct {
 
     log.debug("{} [common: {} conf: {}]", "GrafanaConstruct", common, conf);
 
-    var secret = createSecretFromContext(scope);
+    var secret = fetchSecret(common, conf.secret());
     if (secret == null) {
       this.chart = null;
       return;

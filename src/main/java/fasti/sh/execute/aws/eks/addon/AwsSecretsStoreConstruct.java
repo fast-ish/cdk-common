@@ -2,7 +2,7 @@ package fasti.sh.execute.aws.eks.addon;
 
 import static fasti.sh.execute.serialization.Format.id;
 
-import fasti.sh.model.aws.eks.addon.core.secretprovider.AwsSecretsStoreAddon;
+import fasti.sh.model.aws.eks.addon.core.AwsSecretsStoreAddon;
 import fasti.sh.model.main.Common;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
