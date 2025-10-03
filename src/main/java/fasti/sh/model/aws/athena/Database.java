@@ -1,0 +1,6 @@
+package fasti.sh.model.aws.athena;
+
+public record Database(
+  String name,
+  String description
+) {}

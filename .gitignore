@@ -1,0 +1,93 @@
+# IDE files
+.DS_Store
+.classpath
+.classpath.txt
+.project
+.idea/
+.settings/
+.vscode/
+.claude/
+*.iml
+*.swp
+*.swo
+*~
+
+# Build artifacts
+target/
+build/
+out/
+.out/
+dist/
+*.jar
+*.war
+*.ear
+*.class
+
+# CDK specific
+cdk.out/
+cdk/out/
+.cdk.staging/
+cdk.context.json
+
+# Maven
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+dependency-reduced-pom.xml
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Test reports
+test-results/
+coverage/
+*.coverage
+.coverage
+htmlcov/
+jacoco.exec
+surefire-reports/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+*.env
+
+# AWS
+.aws-sam/
+samconfig.toml
+
+# Security
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+secrets/
+credentials
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Package files
+*.zip
+*.tar.gz
+*.rar
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+tmp/
+temp/
+
+# Release notes (use GitHub Releases instead)
+RELEASE_NOTES_*.md
+release-notes/
+*.release

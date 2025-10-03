@@ -1,0 +1,41 @@
+package fasti.sh.execute.aws.elb;
+
+import static fasti.sh.execute.serialization.Format.id;
+
+import fasti.sh.model.aws.loadbalancer.LoadBalancer;
+import fasti.sh.model.main.Common;
+import fasti.sh.model.main.Common.Maps;
+import java.util.List;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import software.amazon.awscdk.Tags;
+import software.amazon.awscdk.services.ec2.SecurityGroup;
+import software.amazon.awscdk.services.ec2.SubnetSelection;
+import software.amazon.awscdk.services.ec2.Vpc;
+import software.amazon.awscdk.services.elasticloadbalancingv2.NetworkLoadBalancer;
+import software.constructs.Construct;
+
+@Slf4j
+@Getter
+public class NetworkLoadBalancerConstruct extends Construct {
+  private final NetworkLoadBalancer networkLoadBalancer;
+
+  public NetworkLoadBalancerConstruct(Construct scope, Common common, LoadBalancer conf, Vpc vpc, List<SecurityGroup> securityGroups) {
+    super(scope, id("network.loadbalancer", conf.name()));
+
+    log.debug("{} [common: {} conf: {}]", "NetworkLoadBalancerConstruct", common, conf);
+
+    this.networkLoadBalancer = NetworkLoadBalancer.Builder
+      .create(this, conf.name())
+      .loadBalancerName(conf.name())
+      .vpc(vpc)
+      .vpcSubnets(SubnetSelection.builder().availabilityZones(vpc.getAvailabilityZones()).subnets(vpc.getPublicSubnets()).build())
+      .securityGroups(securityGroups)
+      .crossZoneEnabled(conf.crossZoneEnabled())
+      .deletionProtection(conf.deletionProtection())
+      .internetFacing(conf.internetFacing())
+      .build();
+
+    Maps.from(common.tags(), conf.tags()).forEach((key, value) -> Tags.of(this.networkLoadBalancer()).add(key, value));
+  }
+}
