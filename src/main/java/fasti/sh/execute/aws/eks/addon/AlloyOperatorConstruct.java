@@ -114,7 +114,7 @@ public class AlloyOperatorConstruct extends GrafanaBaseConstruct {
 
     log.debug("{} [common: {} conf: {}]", "AlloyOperatorConstruct", common, conf);
 
-    var secret = createSecretFromContext(scope);
+    var secret = fetchSecret(common, conf.secret());
     if (secret == null) {
       this.chart = null;
       return;

@@ -1,37 +1,15 @@
 package fasti.sh.execute.aws.eks.addon;
 
+import fasti.sh.execute.serialization.Mapper;
 import fasti.sh.model.aws.eks.addon.core.GrafanaSecret;
+import fasti.sh.model.main.Common;
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
+import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
 import software.constructs.Construct;
 
-/**
- * Base class for Grafana-related constructs that require Grafana Cloud context validation.
- *
- * <p>
- * This base class provides shared functionality for constructs that depend on Grafana Cloud configuration being present in the CDK context.
- * It handles:
- *
- * <ul>
- * <li><b>Context Validation</b> - Validates all required Grafana context values are present
- * <li><b>Secret Creation</b> - Creates GrafanaSecret from validated context values
- * <li><b>Graceful Degradation</b> - Allows constructs to fail gracefully when context is missing
- * </ul>
- *
- * <p>
- * <b>Required Context Keys:</b>
- *
- * <ul>
- * <li>hosted:eks:grafana:key
- * <li>hosted:eks:grafana:instanceId
- * <li>hosted:eks:grafana:lokiHost
- * <li>hosted:eks:grafana:lokiUsername
- * <li>hosted:eks:grafana:prometheusHost
- * <li>hosted:eks:grafana:prometheusUsername
- * <li>hosted:eks:grafana:tempoHost
- * <li>hosted:eks:grafana:tempoUsername
- * <li>hosted:eks:grafana:pyroscopeHost
- * </ul>
- */
 @Slf4j
 public abstract class GrafanaBaseConstruct extends Construct {
 
@@ -39,41 +17,43 @@ public abstract class GrafanaBaseConstruct extends Construct {
     super(scope, id);
   }
 
-  /**
-   * Creates a GrafanaSecret from CDK context values. Returns null if any required context values are missing.
-   */
-  protected static GrafanaSecret createSecretFromContext(Construct scope) {
-    try {
-      var key = getContextValue(scope, "hosted:eks:grafana:key");
-      var instanceId = getContextValue(scope, "hosted:eks:grafana:instanceId");
-      var lokiHost = getContextValue(scope, "hosted:eks:grafana:lokiHost");
-      var lokiUsername = getContextValue(scope, "hosted:eks:grafana:lokiUsername");
-      var prometheusHost = getContextValue(scope, "hosted:eks:grafana:prometheusHost");
-      var prometheusUsername = getContextValue(scope, "hosted:eks:grafana:prometheusUsername");
-      var tempoHost = getContextValue(scope, "hosted:eks:grafana:tempoHost");
-      var tempoUsername = getContextValue(scope, "hosted:eks:grafana:tempoUsername");
-      var pyroscopeHost = getContextValue(scope, "hosted:eks:grafana:pyroscopeHost");
-
-      if (key == null || instanceId == null || lokiHost == null || lokiUsername == null || prometheusHost == null
-        || prometheusUsername == null || tempoHost == null || tempoUsername == null || pyroscopeHost == null) {
-        log.warn("missing required grafana context values, skipping grafana-related deployments");
-        return null;
-      }
-
-      return new GrafanaSecret(key, lokiHost, lokiUsername, prometheusHost, prometheusUsername, tempoHost, tempoUsername, instanceId,
-        pyroscopeHost);
-    } catch (Exception e) {
-      log.error("failed to create grafana secret from context: {}", e.getMessage(), e);
+  protected static GrafanaSecret fetchSecret(Common common, String secret) {
+    if (secret == null || secret.isEmpty())
       return null;
+
+    try (var client = SecretsManagerClient
+      .builder()
+      .region(Region.of(common.region()))
+      .credentialsProvider(DefaultCredentialsProvider.builder().build())
+      .build()) {
+
+      var secretValueResponse = getSecret(client, secret);
+      if (secretValueResponse != null)
+        return secretValueResponse;
+
+      var arn = String.format("arn:aws:secretsmanager:%s:%s:secret:%s", common.region(), common.account(), secret);
+      return getSecret(client, arn);
+    } catch (Exception e) {
+      throw new RuntimeException("failed to retrieve grafana secret " + e.getMessage(), e);
     }
   }
 
-  /** Retrieves a context value as a non-empty string, or returns null. */
-  protected static String getContextValue(Construct scope, String key) {
-    var value = scope.getNode().tryGetContext(key);
-    if (value instanceof String stringValue && !stringValue.isEmpty()) {
-      return stringValue;
+  private static GrafanaSecret getSecret(SecretsManagerClient client, String id) {
+    try {
+      var secret = client
+        .getSecretValue(
+          GetSecretValueRequest
+            .builder()
+            .secretId(id)
+            .build());
+
+      var value = secret.secretString();
+      if (value != null)
+        return Mapper.get().readValue(value, GrafanaSecret.class);
+
+      return null;
+    } catch (Exception e) {
+      return null;
     }
-    return null;
   }
 }
