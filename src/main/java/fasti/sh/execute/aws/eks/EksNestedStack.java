@@ -4,9 +4,11 @@ import static fasti.sh.execute.serialization.Format.id;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import fasti.sh.execute.aws.cloudwatch.LogGroupConstruct;
 import fasti.sh.execute.aws.sqs.SqsConstruct;
 import fasti.sh.execute.serialization.Mapper;
 import fasti.sh.execute.serialization.Template;
+import fasti.sh.model.aws.cloudwatch.LogGroupConf;
 import fasti.sh.model.aws.eks.KubernetesConf;
 import fasti.sh.model.aws.eks.NodeGroup;
 import fasti.sh.model.aws.eks.RbacConf;
@@ -118,6 +120,7 @@ import software.constructs.Construct;
 public class EksNestedStack extends NestedStack {
   private final Cluster cluster;
   private final IQueue interruptQueue;
+  private final LogGroupConstruct logGroupConstruct;
   private final ManagedAddonsConstruct managedAddonsConstruct;
   private final NodeGroupsConstruct nodeGroupsConstruct;
   private final AddonsConstruct addonsConstruct;
@@ -134,20 +137,27 @@ public class EksNestedStack extends NestedStack {
     var sqs = Mapper.get().readValue(Template.parse(this, conf.sqs()), Sqs.class);
     this.interruptQueue = new SqsConstruct(this, common, sqs).sqs().getQueue();
 
+    var logGroupConf = Mapper.get().readValue(Template.parse(this, conf.logGroup()), LogGroupConf.class);
+    this.logGroupConstruct = new LogGroupConstruct(this, common, logGroupConf);
+    this.logGroupConstruct().getNode().addDependency(this.cluster);
+
     this.managedAddonsConstruct = new ManagedAddonsConstruct(this, common, conf, this.cluster());
 
-    var configuration = Mapper.get().readValue(Template.parse(this, conf.nodeGroups()), new TypeReference<List<NodeGroup>>() {});
+    var configuration = Mapper
+      .get()
+      .readValue(Template.parse(this, conf.nodeGroups()), new TypeReference<List<NodeGroup>>() {});
     this.nodeGroupsConstruct = new NodeGroupsConstruct(this, conf.name(), common, configuration, this.cluster());
     this.nodeGroupsConstruct().getNode().addDependency(this.interruptQueue());
 
     this.addonsConstruct = new AddonsConstruct(this, common, conf, this.cluster());
     this.addonsConstruct().getNode().addDependency(this.managedAddonsConstruct(), this.nodeGroupsConstruct());
 
-    this.observabilityConstruct = new ObservabilityConstruct(this, common, conf.observability());
+    this.observabilityConstruct = new ObservabilityConstruct(this, common, conf.observability(), this.logGroupConstruct.logGroup());
     this
       .observabilityConstruct()
       .getNode()
       .addDependency(
+        this.logGroupConstruct(),
         this.managedAddonsConstruct(),
         this.nodeGroupsConstruct(),
         this.addonsConstruct());
@@ -185,7 +195,13 @@ public class EksNestedStack extends NestedStack {
       .placeClusterHandlerInVpc(true)
       .kubectlLayer(new KubectlV33Layer(this, id("kubectl", conf.name())))
       .defaultCapacity(0)
-      .clusterLogging(conf.loggingTypes().stream().map(String::toUpperCase).map(ClusterLoggingTypes::valueOf).toList())
+      .clusterLogging(
+        conf
+          .loggingTypes()
+          .stream()
+          .map(String::toUpperCase)
+          .map(ClusterLoggingTypes::valueOf)
+          .toList())
       .prune(conf.prune())
       .tags(Common.Maps.from(common.tags(), conf.tags()))
       .build();
@@ -199,15 +215,14 @@ public class EksNestedStack extends NestedStack {
   @SneakyThrows
   private void awsAuthConfigMap(KubernetesConf conf, Cluster eks) {
     var mapper = Mapper.get();
-    var parsed =
-      Template
-        .parse(
-          this,
-          conf.tenancy(),
-          Map
-            .ofEntries(
-              Map.entry("hosted:eks:administrators", tenant("hosted:eks:administrators")),
-              Map.entry("hosted:eks:users", tenant("hosted:eks:users"))));
+    var parsed = Template
+      .parse(
+        this,
+        conf.tenancy(),
+        Map
+          .ofEntries(
+            Map.entry("hosted:eks:administrators", tenant("hosted:eks:administrators")),
+            Map.entry("hosted:eks:users", tenant("hosted:eks:users"))));
     var tenancy = mapper.readValue(parsed, TenancyConf.class);
 
     tenancy
@@ -215,7 +230,12 @@ public class EksNestedStack extends NestedStack {
       .forEach(
         administrator -> eks
           .getAwsAuth()
-          .addMastersRole(Role.fromRoleArn(this, String.format("%s-admin-lookup", administrator.role()), administrator.role())));
+          .addMastersRole(
+            Role
+              .fromRoleArn(
+                this,
+                String.format("%s-admin-lookup", administrator.role()),
+                administrator.role())));
 
     Optional
       .ofNullable(tenancy.users())
@@ -227,7 +247,11 @@ public class EksNestedStack extends NestedStack {
               .getAwsAuth()
               .addRoleMapping(
                 Role.fromRoleArn(this, String.format("%s-user-lookup", user.role()), user.role()),
-                AwsAuthMapping.builder().username(user.username()).groups(List.of("eks:read-only")).build())));
+                AwsAuthMapping
+                  .builder()
+                  .username(user.username())
+                  .groups(List.of("eks:read-only"))
+                  .build())));
   }
 
   private void rbac(KubernetesConf conf, Cluster eks) throws JsonProcessingException {
@@ -235,8 +259,12 @@ public class EksNestedStack extends NestedStack {
     var parsed = Template.parse(this, conf.rbac());
     var rbac = Serialization.unmarshal(parsed, RbacConf.class);
 
-    var userClusterRoleBindingManifest =
-      mapper.readValue(Serialization.asYaml(rbac.userClusterRoleBinding()), new TypeReference<Map<String, Object>>() {});
+    var userClusterRoleBindingManifest = mapper
+      .readValue(
+        Serialization
+          .asYaml(
+            rbac.userClusterRoleBinding()),
+        new TypeReference<Map<String, Object>>() {});
     KubernetesManifest.Builder
       .create(this, "user-cluster-role-binding")
       .cluster(eks)
@@ -246,8 +274,12 @@ public class EksNestedStack extends NestedStack {
       .manifest(List.of(userClusterRoleBindingManifest))
       .build();
 
-    var userClusterRoleManifest =
-      mapper.readValue(Serialization.asYaml(rbac.userClusterRole()), new TypeReference<Map<String, Object>>() {});
+    var userClusterRoleManifest = mapper
+      .readValue(
+        Serialization
+          .asYaml(
+            rbac.userClusterRole()),
+        new TypeReference<Map<String, Object>>() {});
     KubernetesManifest.Builder
       .create(this, "user-cluster-role")
       .cluster(eks)

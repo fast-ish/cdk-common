@@ -25,7 +25,7 @@ import software.amazon.awscdk.services.cloudwatch.MetricProps;
 import software.amazon.awscdk.services.cloudwatch.TreatMissingData;
 import software.amazon.awscdk.services.cloudwatch.actions.SnsAction;
 import software.amazon.awscdk.services.logs.FilterPattern;
-import software.amazon.awscdk.services.logs.LogGroup;
+import software.amazon.awscdk.services.logs.ILogGroup;
 import software.amazon.awscdk.services.logs.MetricFilter;
 import software.amazon.awscdk.services.sns.ITopic;
 import software.amazon.awscdk.services.sns.Topic;
@@ -108,7 +108,7 @@ public class ObservabilityConstruct extends Construct {
   private final Map<String, ITopic> alarmTopics;
 
   @SneakyThrows
-  public ObservabilityConstruct(Construct scope, Common common, String conf) {
+  public ObservabilityConstruct(Construct scope, Common common, String conf, ILogGroup logGroup) {
     super(scope, id("observability", common.name()));
 
     var mapper = Mapper.get();
@@ -118,7 +118,7 @@ public class ObservabilityConstruct extends Construct {
     log.debug("{} [common: {} conf: {}]", "ObservabilityConstruct", common, observability);
 
     this.alarmTopics = createAlarmTopics(scope, observability.topics());
-    this.metricFilters = createMetricFilters(scope, observability.metrics());
+    this.metricFilters = createMetricFilters(scope, logGroup, observability.metrics());
     this.alarms = createAlarms(scope, common, observability.alarms());
     this.dashboards = createDashboards(scope, common, observability.dashboards());
   }
@@ -142,7 +142,7 @@ public class ObservabilityConstruct extends Construct {
     }, HashMap::putAll);
   }
 
-  private List<MetricFilter> createMetricFilters(Construct scope, List<MetricFilterConf> metricFilters) {
+  private List<MetricFilter> createMetricFilters(Construct scope, ILogGroup logGroup, List<MetricFilterConf> metricFilters) {
     if (metricFilters == null || metricFilters.isEmpty()) {
       return List.of();
     }
@@ -152,7 +152,7 @@ public class ObservabilityConstruct extends Construct {
       .map(
         conf -> MetricFilter.Builder
           .create(scope, id("metric-filter", conf.filterName()))
-          .logGroup(LogGroup.fromLogGroupName(scope, conf.filterName() + "-log-group-lookup", conf.logGroupName()))
+          .logGroup(logGroup)
           .filterPattern(FilterPattern.literal(conf.filterPattern()))
           .metricName(conf.metricName())
           .metricNamespace(conf.metricNamespace())
