@@ -6,7 +6,6 @@ import fasti.sh.execute.aws.eks.addon.AlloyOperatorConstruct;
 import fasti.sh.execute.aws.eks.addon.AwsLoadBalancerConstruct;
 import fasti.sh.execute.aws.eks.addon.AwsSecretsStoreConstruct;
 import fasti.sh.execute.aws.eks.addon.CertManagerConstruct;
-import fasti.sh.execute.aws.eks.addon.CsiSecretsStoreConstruct;
 import fasti.sh.execute.aws.eks.addon.GrafanaConstruct;
 import fasti.sh.execute.aws.eks.addon.KarpenterConstruct;
 import fasti.sh.execute.serialization.Mapper;
@@ -14,6 +13,7 @@ import fasti.sh.execute.serialization.Template;
 import fasti.sh.model.aws.eks.KubernetesConf;
 import fasti.sh.model.aws.eks.addon.AddonsConf;
 import fasti.sh.model.main.Common;
+import java.util.Map;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,6 @@ public class AddonsConstruct extends Construct {
   private final AlloyOperatorConstruct alloyOperator;
   private final GrafanaConstruct grafana;
   private final CertManagerConstruct certManager;
-  private final CsiSecretsStoreConstruct csiSecretsStore;
   private final AwsSecretsStoreConstruct awsSecretsStore;
   private final KarpenterConstruct karpenter;
   private final AwsLoadBalancerConstruct awsLoadBalancer;
@@ -37,7 +36,18 @@ public class AddonsConstruct extends Construct {
 
     log.debug("{} [common: {} conf: {}]", "AddonsConstruct", common, conf);
 
-    var addons = Mapper.get().readValue(Template.parse(scope, conf.addons()), AddonsConf.class);
+    var addons = Mapper
+      .get()
+      .readValue(
+        Template
+          .parse(
+            scope,
+            conf.addons(),
+            Map
+              .of(
+                "hosted:eks:grafana:secret",
+                scope.getNode().getContext("hosted:eks:grafana:secret").toString())),
+        AddonsConf.class);
 
     this.alloyOperator = new AlloyOperatorConstruct(this, common, addons.alloyOperator(), cluster);
 
@@ -47,14 +57,14 @@ public class AddonsConstruct extends Construct {
     this.certManager = new CertManagerConstruct(this, common, addons.certManager(), cluster);
     this.certManager().getNode().addDependency(this.grafana());
 
-    this.csiSecretsStore = new CsiSecretsStoreConstruct(this, common, addons.csiSecretsStore(), cluster);
-    this.csiSecretsStore().getNode().addDependency(this.grafana(), this.certManager());
-
     this.awsSecretsStore = new AwsSecretsStoreConstruct(this, common, addons.awsSecretsStore(), cluster);
-    this.awsSecretsStore().getNode().addDependency(this.grafana(), this.certManager(), this.csiSecretsStore());
+    this.awsSecretsStore().getNode().addDependency(this.grafana(), this.certManager(), this.certManager());
 
     this.karpenter = new KarpenterConstruct(this, common, addons.karpenter(), cluster);
-    this.karpenter().getNode().addDependency(this.grafana(), this.certManager(), this.csiSecretsStore(), this.awsSecretsStore());
+    this
+      .karpenter()
+      .getNode()
+      .addDependency(this.grafana(), this.certManager(), this.awsSecretsStore());
 
     this.awsLoadBalancer = new AwsLoadBalancerConstruct(this, common, addons.awsLoadBalancer(), cluster);
     this
@@ -63,7 +73,6 @@ public class AddonsConstruct extends Construct {
       .addDependency(
         this.grafana(),
         this.certManager(),
-        this.csiSecretsStore(),
         this.awsSecretsStore(),
         this.karpenter());
   }

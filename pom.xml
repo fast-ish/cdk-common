@@ -23,7 +23,7 @@
         <kubernetes.models.version>7.3.1</kubernetes.models.version>
 
         <lombok.version>1.18.40</lombok.version>
-        <jackson.version>2.20.0</jackson.version>
+        <jackson.version>2.19.2</jackson.version>
         <mustache.version>0.9.14</mustache.version>
         <log4j2.version>2.25.2</log4j2.version>
 
@@ -34,14 +34,14 @@
 
         <junit.version>5.14.0</junit.version>
 
-        <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>
-        <maven.surefire.plugin.version>3.5.3</maven.surefire.plugin.version>
+        <maven.compiler.plugin.version>3.14.1</maven.compiler.plugin.version>
+        <maven.surefire.plugin.version>3.5.4</maven.surefire.plugin.version>
         <maven.shade.plugin.version>3.6.0</maven.shade.plugin.version>
         <maven.exec.plugin.version>3.5.0</maven.exec.plugin.version>
         <maven.clean.plugin.version>3.4.0</maven.clean.plugin.version>
         <maven.pmd.plugin.version>3.27.0</maven.pmd.plugin.version>
         <maven.checkstyle.plugin.version>3.6.0</maven.checkstyle.plugin.version>
-        <spotbugs.maven.plugin.version>4.9.4.1</spotbugs.maven.plugin.version>
+        <spotbugs.maven.plugin.version>4.9.6.0</spotbugs.maven.plugin.version>
         <jacoco.maven.plugin.version>0.8.13</jacoco.maven.plugin.version>
         <dependency.check.maven.version>11.1.1</dependency.check.maven.version>
         <spotless.maven.plugin.version>2.46.1</spotless.maven.plugin.version>

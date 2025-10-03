@@ -125,6 +125,8 @@ import java.util.Map;
  *          JSON configuration for managed and custom Kubernetes add-ons
  * @param sqs
  *          JSON configuration for SQS integration and event processing
+ * @param logGroup
+ *          JSON configuration for CloudWatch log group for EKS control plane logs
  * @param observability
  *          JSON configuration for monitoring, logging, and alerting
  * @param annotations
@@ -152,6 +154,7 @@ public record KubernetesConf(
   String nodeGroups,
   String addons,
   String sqs,
+  String logGroup,
   String observability,
   Map<String, String> annotations,
   Map<String, String> labels,
