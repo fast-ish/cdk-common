@@ -34,14 +34,14 @@
 
         <junit.version>5.13.4</junit.version>
 
-        <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>
-        <maven.surefire.plugin.version>3.5.3</maven.surefire.plugin.version>
+        <maven.compiler.plugin.version>3.14.1</maven.compiler.plugin.version>
+        <maven.surefire.plugin.version>3.5.4</maven.surefire.plugin.version>
         <maven.shade.plugin.version>3.6.0</maven.shade.plugin.version>
         <maven.exec.plugin.version>3.5.0</maven.exec.plugin.version>
         <maven.clean.plugin.version>3.4.0</maven.clean.plugin.version>
         <maven.pmd.plugin.version>3.27.0</maven.pmd.plugin.version>
         <maven.checkstyle.plugin.version>3.6.0</maven.checkstyle.plugin.version>
-        <spotbugs.maven.plugin.version>4.9.4.1</spotbugs.maven.plugin.version>
+        <spotbugs.maven.plugin.version>4.9.6.0</spotbugs.maven.plugin.version>
         <jacoco.maven.plugin.version>0.8.13</jacoco.maven.plugin.version>
         <dependency.check.maven.version>11.1.1</dependency.check.maven.version>
         <spotless.maven.plugin.version>2.46.1</spotless.maven.plugin.version>
