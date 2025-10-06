@@ -20,7 +20,7 @@
         <aws.sdk.version>2.34.9</aws.sdk.version>
         <aws.cognito.identitypool.version>2.186.0-alpha.0</aws.cognito.identitypool.version>
 
-        <kubernetes.models.version>7.3.1</kubernetes.models.version>
+        <kubernetes.models.version>7.4.0</kubernetes.models.version>
 
         <lombok.version>1.18.40</lombok.version>
         <jackson.version>2.19.2</jackson.version>
