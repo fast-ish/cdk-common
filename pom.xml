@@ -23,7 +23,7 @@
         <kubernetes.models.version>7.3.1</kubernetes.models.version>
 
         <lombok.version>1.18.40</lombok.version>
-        <jackson.version>2.19.2</jackson.version>
+        <jackson.version>2.20.0</jackson.version>
         <mustache.version>0.9.14</mustache.version>
         <log4j2.version>2.25.2</log4j2.version>
 
