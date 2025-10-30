@@ -2,7 +2,7 @@
 
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.java.net/projects/jdk/21/)
 [![Maven](https://img.shields.io/badge/Maven-3.8+-blue.svg)](https://maven.apache.org/)
-[![AWS CDK](https://img.shields.io/badge/AWS%20CDK-2.206.0-yellow.svg)](https://aws.amazon.com/cdk/)
+[![AWS CDK](https://img.shields.io/badge/AWS%20CDK-2.221.0-yellow.svg)](https://aws.amazon.com/cdk/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](#)
 [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)](#)
 
@@ -12,7 +12,7 @@ AWS CDK constructs library for enterprise infrastructure.
 
 - Java 21+
 - Maven 3.8+
-- [AWS CDK](https://aws.amazon.com/cdk/) 2.206.0
+- [AWS CDK](https://aws.amazon.com/cdk/) 2.221.0
 
 ## Usage
 

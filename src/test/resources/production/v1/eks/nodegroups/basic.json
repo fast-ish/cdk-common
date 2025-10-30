@@ -1,0 +1,30 @@
+[
+  {
+    "name": "ng-1",
+    "amiType": "AL2_x86_64",
+    "instanceClass": "t3",
+    "instanceSize": "medium",
+    "minSize": 1,
+    "maxSize": 3,
+    "desiredSize": 2,
+    "capacityType": "on_demand",
+    "forceUpdate": false,
+    "labels": {
+      "role": "worker",
+      "environment": "test"
+    },
+    "tags": {},
+    "role": {
+      "name": "ng-1-role",
+      "path": "/",
+      "description": "Node group role",
+      "managedPolicies": ["arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy", "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly", "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"],
+      "inlinePolicies": [],
+      "assumeRolePolicyDocument": null,
+      "principal": {
+        "service": "ec2.amazonaws.com"
+      },
+      "tags": {}
+    }
+  }
+]

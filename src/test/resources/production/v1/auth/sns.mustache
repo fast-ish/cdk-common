@@ -1,0 +1,15 @@
+enabled: true
+externalId: test-external-id
+role:
+  name: test-cognito-sns-role
+  principal:
+    type: service
+    value: cognito-idp.amazonaws.com
+    conditions:
+      StringEquals:
+        "sts:ExternalId": test-external-id
+  managedPolicyNames:
+    - AmazonSNSFullAccess
+  customPolicies: []
+  tags:
+    Environment: test

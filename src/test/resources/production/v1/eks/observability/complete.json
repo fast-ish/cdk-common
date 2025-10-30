@@ -1,0 +1,41 @@
+{
+  "topics": {
+    "critical": ["oncall@example.com"],
+    "warnings": ["team@example.com"]
+  },
+  "metrics": [
+    {
+      "filterName": "app-errors",
+      "logGroupName": "/aws/application/logs",
+      "filterPattern": "ERROR",
+      "metricName": "ApplicationErrors",
+      "metricNamespace": "Custom/App",
+      "metricValue": "1",
+      "defaultValue": 0
+    }
+  ],
+  "alarms": [
+    {
+      "name": "critical-errors",
+      "description": "Critical error alarm",
+      "metricNamespace": "Custom/App",
+      "metricName": "ApplicationErrors",
+      "statistic": "Sum",
+      "dimensions": {},
+      "periodMinutes": 1,
+      "evaluationPeriods": 1,
+      "threshold": 5,
+      "comparisonOperator": "GREATER_THAN_THRESHOLD",
+      "treatMissingData": "NOT_BREACHING",
+      "alarmActions": ["critical"],
+      "tags": {}
+    }
+  ],
+  "dashboards": [
+    {
+      "name": "main-dashboard",
+      "body": "{\"widgets\":[{\"type\":\"metric\"}]}",
+      "tags": {}
+    }
+  ]
+}

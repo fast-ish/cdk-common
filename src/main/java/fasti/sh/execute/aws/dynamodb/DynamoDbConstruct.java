@@ -18,8 +18,10 @@ import software.amazon.awscdk.services.dynamodb.Attribute;
 import software.amazon.awscdk.services.dynamodb.AutoscaledCapacityOptions;
 import software.amazon.awscdk.services.dynamodb.Billing;
 import software.amazon.awscdk.services.dynamodb.Capacity;
+import software.amazon.awscdk.services.dynamodb.ContributorInsightsSpecification;
 import software.amazon.awscdk.services.dynamodb.GlobalSecondaryIndexPropsV2;
 import software.amazon.awscdk.services.dynamodb.LocalSecondaryIndexProps;
+import software.amazon.awscdk.services.dynamodb.PointInTimeRecoverySpecification;
 import software.amazon.awscdk.services.dynamodb.StreamViewType;
 import software.amazon.awscdk.services.dynamodb.TableClass;
 import software.amazon.awscdk.services.dynamodb.TableEncryptionV2;
@@ -126,9 +128,11 @@ public class DynamoDbConstruct extends Construct {
       .localSecondaryIndexes(conf.localSecondaryIndexes().stream().map(DynamoDbConstruct::localSecondaryIndex).toList())
       .globalSecondaryIndexes(conf.globalSecondaryIndexes().stream().map(DynamoDbConstruct::globalSecondaryIndex).toList())
       .tableClass(TableClass.valueOf(conf.tableClass().toUpperCase()))
-      .contributorInsights(conf.contributorInsights())
+      .contributorInsightsSpecification(
+        ContributorInsightsSpecification.builder().enabled(conf.contributorInsights()).build())
       .deletionProtection(conf.deletionProtection())
-      .pointInTimeRecovery(conf.pointInTimeRecovery())
+      .pointInTimeRecoverySpecification(
+        PointInTimeRecoverySpecification.builder().pointInTimeRecoveryEnabled(conf.pointInTimeRecovery()).build())
       .removalPolicy(RemovalPolicy.valueOf(conf.removalPolicy().toUpperCase()))
       .tags(
         Maps

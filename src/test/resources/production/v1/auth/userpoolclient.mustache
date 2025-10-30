@@ -1,0 +1,37 @@
+name: test-userpoolclient
+idTokenValidity: PT1H
+accessTokenValidity: PT1H
+authSessionValidity: PT5M
+refreshTokenValidity: PT2H
+enableTokenRevocation: true
+generateSecret: false
+disableOAuth: false
+preventUserExistenceErrors: true
+enablePropagateAdditionalUserContextData: true
+oauth:
+  implicitCodeGrant: false
+  clientCredentials: false
+  authorizationCodeGrant: true
+  scopes:
+    - email
+    - openid
+  callbackUrls:
+    - https://example.com/callback
+  logoutUrls:
+    - https://example.com/logout
+readAttributes:
+  email: true
+  email_verified: true
+  preferred_username: true
+writeAttributes:
+  email: true
+  preferred_username: true
+customAttributes:
+  - custom1
+authFlow:
+  adminUserPassword: true
+  userPassword: true
+  userSrp: true
+  custom: false
+tags:
+  Environment: test

@@ -1,0 +1,58 @@
+name: test-userpool
+triggers: auth/triggers.mustache
+sns: auth/sns.mustache
+ses: auth/ses.mustache
+selfSignup: true
+featurePlan: plus
+standardThreatProtectionMode: audit_only
+accountRecovery: email_only
+deletionProtection: false
+removalPolicy: destroy
+groups:
+  - name: users
+    description: "regular users"
+    precedence: 1
+autoVerify:
+  email: true
+  phone: false
+aliases:
+  email: true
+  phone: false
+  username: false
+  preferredUsername: false
+keepOriginalAttributes:
+  email: true
+  phone: false
+deviceTracking:
+  newDeviceChallenge: false
+  rememberOnUserPrompt: false
+mfa:
+  type: off
+  message: "Your verification code is {####}."
+  otp: false
+  sms: false
+passwordPolicy:
+  minLength: 8
+  requireLowercase: true
+  requireUppercase: true
+  requireDigits: true
+  requireSymbols: false
+  tempPasswordValidity: 1
+verification:
+  emailStyle: code
+  emailSubject: "Test verification"
+  emailBody: "Your verification code is {####}."
+  smsMessage: "Your code is {####}."
+standardAttributes:
+  email:
+    mutable: false
+    required: true
+  preferredUsername:
+    mutable: true
+    required: false
+customAttributes:
+  - name: custom1
+    type: string
+    mutable: true
+tags:
+  Environment: test
